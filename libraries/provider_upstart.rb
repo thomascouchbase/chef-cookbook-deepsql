@@ -14,6 +14,7 @@
 # limitations under the License.
 #
 
+require 'uri'
 require 'chef/provider/lwrp_base'
 require_relative './helpers.rb'
 
@@ -30,6 +31,70 @@ class Chef
 
       action :create do
         Chef::Log.info("Upstart::Create")
+
+        # install system dependencies...
+
+        requirements = %w{
+          libaio1
+        }
+
+        requirements.each do |package|
+          apt_package package do
+            action :install
+          end
+        end
+
+        # install software bundle...
+
+        ruby_block 'set debconf for mysql' do
+          block do
+            `echo mysql-server mysql-server/root_password password '#{root_password}' | sudo debconf-set-selections`
+            `echo mysql-server mysql-server/root_password_again password '#{root_password}' | sudo debconf-set-selections`
+            `echo deep-plugin deep-plugin/deep_activation_key string #{new_resource.activation_key} | debconf-set-selections`
+            `echo deep-plugin deep-plugin/deep_mysql_root_password password #{root_password} | debconf-set-selections`
+          end
+          action :create
+          not_if { ::File.exists?("/etc/mysql/my.cnf") }
+        end
+
+        download_url = new_resource.install_bundle_url
+        if download_url.nil?
+          download_url = "https://deepsql.s3.amazonaws.com/apt/#{node['platform']}/trusty/mysql-#{new_resource.version}/deepsql_3.3.1_amd64.deb-bundle.tar"
+        end
+
+        tmp = '/tmp'
+        path = "#{tmp}/#{URI(download_url).path.split('/').last}"
+        Chef::Log.info(download_url)
+        Chef::Log.info(path)
+
+        remote_file path do
+          source download_url
+          action :create_if_missing
+        end
+
+        execute "tar xf #{path}" do
+          cwd tmp
+        end
+
+        packages = %w{
+          mysql-common
+          libmysqlclient18
+          libmysqlclient-dev
+          mysql-community-client
+          mysql-client
+          mysql-community-server
+          mysql-server
+          deep-mysql-community-plugin
+        }
+
+        packages.each do |package|
+          package package do
+            action :install
+            provider Chef::Provider::Package::Dpkg
+            source "/tmp/bundle/#{package}.deb"
+          end
+        end
+
       end
 
       action :delete do

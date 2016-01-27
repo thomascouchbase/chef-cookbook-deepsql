@@ -14,6 +14,7 @@
 # limitations under the License.
 #
 
+require 'shellwords'
 require 'chef/mixin/shell_out'
 
 module DeepSql
@@ -44,5 +45,14 @@ module DeepSql
       output = shell_out!(command)
       output.stdout
     end
+
+    def root_password
+      if new_resource.initial_root_password == ''
+        Chef::Log.info('Root password is empty')
+        return ''
+      end
+      Shellwords.escape(new_resource.initial_root_password)
+    end
+
   end
 end
