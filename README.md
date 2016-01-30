@@ -1,6 +1,8 @@
 deepSQL Cookbook
 =======================
 
+[![Build Status](https://travis-ci.org/DeepInfoSci/chef-cookbook-deepsql.svg?branch=master)](https://travis-ci.org/DeepInfoSci/chef-cookbook-deepsql)
+
 The deepSQL Cookbook is a library cookbook that provides resource primitives
 (LWRPs) for use in recipes. It is designed to be a reference example for
 creating highly reusable cross-platform cookbooks.
