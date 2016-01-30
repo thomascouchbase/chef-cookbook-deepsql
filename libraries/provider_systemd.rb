@@ -20,15 +20,14 @@ require_relative './helpers.rb'
 class Chef
   class Provider
     class DeepSqlProviderSystemd < DeepSqlProviderBase
-
       if defined?(provides)
-        provides :deepsql_service, :os => 'linux' do
+        provides :deepsql_service, os: 'linux' do
           Chef::Platform::ServiceHelpers.service_resource_providers.include?(:systemd)
         end
       end
 
       action :create do
-        Chef::Log.info("Systemd::Create")
+        Chef::Log.info('Systemd::Create')
       end
 
       action :delete do
@@ -44,7 +43,6 @@ class Chef
 
       def something
       end
-
     end
   end
 end

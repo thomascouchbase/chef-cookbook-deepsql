@@ -29,3 +29,7 @@ Style/ClassAndModuleChildren:
   Enabled: false
 Style/FileName:
   Enabled: false
+IndentationWidth:
+  Enabled: false
+ModuleLength:
+  Enabled: false

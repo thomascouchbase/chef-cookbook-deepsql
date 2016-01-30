@@ -20,7 +20,6 @@ require_relative './helpers.rb'
 class Chef
   class Provider
     class DeepSqlProviderBase < Chef::Provider::LWRPBase
-
       use_inline_resources if defined?(use_inline_resources)
 
       include DeepSql::Helper
@@ -30,7 +29,7 @@ class Chef
       end
 
       action :create do
-        Chef::Log.info("Base::Create")
+        Chef::Log.info('Base::Create')
 
         install_software
 
@@ -47,7 +46,6 @@ class Chef
         create_configuration_file
 
         initialize_database
-
       end
 
       def initialize_database
@@ -67,16 +65,14 @@ class Chef
           owner new_resource.run_user
           group new_resource.run_group
           mode '0755'
-          variables(
-              :config          => new_resource,
-              :error_log       => error_log,
-              :include_dir     => include_dir,
-              :lc_messages_dir => lc_messages_dir,
-              :pid_file        => pid_file,
-              :socket_file     => socket_file,
-              :tmp_dir         => tmp_dir,
-              :data_dir        => parsed_data_dir
-          )
+          variables(config: new_resource,
+                    error_log: error_log,
+                    include_dir: include_dir,
+                    lc_messages_dir: lc_messages_dir,
+                    pid_file: pid_file,
+                    socket_file: socket_file,
+                    tmp_dir: tmp_dir,
+                    data_dir: parsed_data_dir)
           action :create
         end
 
@@ -89,7 +85,6 @@ class Chef
           mode '0600'
           action :create
         end
-
       end
 
       action :delete do
@@ -118,7 +113,6 @@ class Chef
       end
 
       def create_support_directories
-
         # Support directories
         directory "#{new_resource.name} :create #{etc_dir}" do
           path etc_dir
@@ -165,7 +159,6 @@ class Chef
           action :create
         end
       end
-
     end
   end
 end

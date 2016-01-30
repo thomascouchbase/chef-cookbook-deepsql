@@ -21,9 +21,8 @@ require_relative './helpers.rb'
 class Chef
   class Provider
     class DeepSqlProviderUpstart < DeepSqlProviderBase
-
       if defined?(provides)
-        provides :deepsql_service, :os => 'linux' do
+        provides :deepsql_service, os: 'linux' do
           Chef::Platform::ServiceHelpers.service_resource_providers.include?(:upstart) &&
               !Chef::Platform::ServiceHelpers.service_resource_providers.include?(:redhat)
         end
@@ -33,7 +32,7 @@ class Chef
         service "#{new_resource.name} :create #{system_service_name}" do
           service_name system_service_name
           provider Chef::Provider::Service::Init
-          supports :status => true
+          supports status: true
           action [:stop, :disable]
         end
       end
@@ -82,14 +81,12 @@ class Chef
           owner 'root'
           group 'root'
           mode '0644'
-          variables(
-              :data_dir     => parsed_data_dir,
-              :deepsql_name => deepsql_name,
-              :log_dir      => log_dir,
-              :run_dir      => run_dir,
-              :pid_file     => pid_file,
-              :socket_file  => socket_file
-          )
+          variables(data_dir: parsed_data_dir,
+                    deepsql_name: deepsql_name,
+                    log_dir: log_dir,
+                    run_dir: run_dir,
+                    pid_file: pid_file,
+                    socket_file: socket_file)
           action :create
           notifies :restart, "service[#{new_resource.name} :create apparmor]", :immediately
         end
@@ -101,13 +98,13 @@ class Chef
       end
 
       def install_software
-        Chef::Log.info("Upstart::Create")
+        Chef::Log.info('Upstart::Create')
 
         # install system dependencies...
 
-        requirements = %w{
+        requirements = %w(
           libaio1
-        }
+        )
 
         requirements.each do |package|
           apt_package package do
@@ -125,7 +122,7 @@ class Chef
             `echo deep-plugin deep-plugin/deep_mysql_root_password password #{root_password} | debconf-set-selections`
           end
           action :create
-          not_if { ::File.exists?("/etc/mysql/my.cnf") }
+          not_if { ::File.exist?('/etc/mysql/my.cnf') }
         end
 
         download_url = new_resource.install_bundle_url
@@ -133,7 +130,7 @@ class Chef
           download_url = "https://deepsql.s3.amazonaws.com/apt/#{node['platform']}/trusty/mysql-#{new_resource.version}/deepsql_3.3.1_amd64.deb-bundle.tar"
         end
 
-        tmp  = '/tmp'
+        tmp = '/tmp'
         path = "#{tmp}/#{URI(download_url).path.split('/').last}"
         Chef::Log.info(download_url)
         Chef::Log.info(path)
@@ -147,7 +144,7 @@ class Chef
           cwd tmp
         end
 
-        packages = %w{
+        packages = %w(
           mysql-common
           libmysqlclient18
           libmysqlclient-dev
@@ -156,7 +153,7 @@ class Chef
           mysql-community-server
           mysql-server
           deep-mysql-community-plugin
-        }
+        )
 
         packages.each do |package|
           package package do
@@ -165,7 +162,6 @@ class Chef
             source "/tmp/bundle/#{package}.deb"
           end
         end
-
       end
 
       action :delete do
@@ -178,7 +174,7 @@ class Chef
           owner 'root'
           group 'root'
           mode '0755'
-          variables(:socket_file => socket_file)
+          variables(socket_file: socket_file)
           cookbook 'deepsql'
           action :create
         end
@@ -189,16 +185,14 @@ class Chef
           owner 'root'
           group 'root'
           mode '0644'
-          variables(
-              :defaults_file => defaults_file,
-              :deepsql_name  => deepsql_name,
-              :pid_file      => pid_file,
-              :run_group     => new_resource.run_group,
-              :run_user      => new_resource.run_user,
-              :run_dir       => run_dir,
-              :socket_dir    => socket_dir,
-              :socket_file   => socket_file
-          )
+          variables(defaults_file: defaults_file,
+                    deepsql_name: deepsql_name,
+                    pid_file: pid_file,
+                    run_group: new_resource.run_group,
+                    run_user: new_resource.run_user,
+                    run_dir: run_dir,
+                    socket_dir: socket_dir,
+                    socket_file: socket_file)
           cookbook 'deepsql'
           action :create
         end
@@ -206,10 +200,9 @@ class Chef
         service "#{new_resource.name} :start #{deepsql_name}" do
           service_name deepsql_name
           provider Chef::Provider::Service::Upstart
-          supports :status => true
+          supports status: true
           action [:start]
         end
-
       end
 
       action :stop do
@@ -219,7 +212,6 @@ class Chef
 
       def something
       end
-
     end
   end
 end

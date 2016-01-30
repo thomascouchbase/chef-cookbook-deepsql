@@ -20,11 +20,10 @@ require_relative './helpers.rb'
 class Chef
   class Provider
     class DeepSqlProviderSysVinit < DeepSqlProviderBase
-
-      provides :deepsql_service, :os => '!windows' if defined?(provides)
+      provides :deepsql_service, os: '!windows' if defined?(provides)
 
       action :create do
-        Chef::Log.info("SysVinit::Create")
+        Chef::Log.info('SysVinit::Create')
       end
 
       action :delete do
@@ -40,7 +39,6 @@ class Chef
 
       def something
       end
-
     end
   end
 end

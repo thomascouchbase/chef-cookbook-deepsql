@@ -24,35 +24,27 @@ require_relative 'provider_upstart'
 # Chef::Resource::DeepSqlProviderSystemd Providers (centos, redhat)
 #########################################################################
 
-Chef::Platform.set(
-    :platform => :centos,
-    :version  => '>= 7.0',
-    :resource => :deepsql_service,
-    :provider => Chef::Provider::DeepSqlProviderSystemd
-)
+Chef::Platform.set(platform: :centos,
+                   version: '>= 7.0',
+                   resource: :deepsql_service,
+                   provider: Chef::Provider::DeepSqlProviderSystemd)
 
-Chef::Platform.set(
-    :platform => :redhat,
-    :version  => '>= 7.0',
-    :resource => :deepsql_service,
-    :provider => Chef::Provider::DeepSqlProviderSystemd
-)
+Chef::Platform.set(platform: :redhat,
+                   version: '>= 7.0',
+                   resource: :deepsql_service,
+                   provider: Chef::Provider::DeepSqlProviderSystemd)
 
 #########################################################################
 # Chef::Resource::DeepSqlProviderUpstart Providers (ubuntu)
 #########################################################################
 
-Chef::Platform.set(
-    :platform => :ubuntu,
-    :resource => :deepsql_service,
-    :provider => Chef::Provider::DeepSqlProviderUpstart
-)
+Chef::Platform.set(platform: :ubuntu,
+                   resource: :deepsql_service,
+                   provider: Chef::Provider::DeepSqlProviderUpstart)
 
 #########################################################################
 # Chef::Resource::DeepSqlProviderSysVinit Providers (default)
 #########################################################################
 
-Chef::Platform.set(
-    :resource => :deepsql_service,
-    :provider => Chef::Provider::DeepSqlProviderSysVinit
-)
+Chef::Platform.set(resource: :deepsql_service,
+                   provider: Chef::Provider::DeepSqlProviderSysVinit)

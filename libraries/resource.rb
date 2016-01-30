@@ -19,7 +19,6 @@ require 'chef/resource/lwrp_base'
 class Chef
   class Resource
     class DeepSqlResource < Chef::Resource::LWRPBase
-
       provides :deepsql_service
 
       self.resource_name = :deepsql_service
@@ -28,33 +27,29 @@ class Chef
       default_action :create
       state_attrs :started, :created
 
-      attribute :activation_key, :kind_of => String, :default => '000000000000000000000000000000000'
-      attribute :bind_address, :kind_of => String, :default => nil
-      attribute :charset, :kind_of => String, :default => 'utf8'
-      attribute :data_dir, :kind_of => String, :default => nil
-      attribute :error_log, :kind_of => String, :default => nil
-      attribute :initial_root_password, :kind_of => String, :default => 'ilikerandompasswords'
-      attribute :instance, :kind_of => String, :name_attribute => true
-      attribute :mysqld_options, :kind_of => Hash, :default => {}
-      attribute :package_action, :kind_of => Symbol, :default => :install
-      attribute :package_name, :kind_of => String, :default => nil
-      attribute :package_version, :kind_of => String, :default => nil
-      attribute :pid_file, :kind_of => String, :default => nil
-      attribute :port, :kind_of => [String, Integer], :default => '3306'
-      attribute :run_group, :kind_of => String, :default => 'mysql'
-      attribute :run_user, :kind_of => String, :default => 'mysql'
-      attribute :socket, :kind_of => String, :default => nil
-      attribute :tmp_dir, :kind_of => String, :default => nil
-      attribute :version, :kind_of => String, :default => nil
-
+      attribute :activation_key, kind_of: String, default: '000000000000000000000000000000000'
+      attribute :bind_address, kind_of: String, default: nil
+      attribute :charset, kind_of: String, default: 'utf8'
+      attribute :data_dir, kind_of: String, default: nil
+      attribute :error_log, kind_of: String, default: nil
+      attribute :initial_root_password, kind_of: String, default: 'ilikerandompasswords'
+      attribute :instance, kind_of: String, name_attribute: true
+      attribute :mysqld_options, kind_of: Hash, default: {}
+      attribute :package_action, kind_of: Symbol, default: :install
+      attribute :package_name, kind_of: String, default: nil
+      attribute :package_version, kind_of: String, default: nil
+      attribute :pid_file, kind_of: String, default: nil
+      attribute :port, kind_of: [String, Integer], default: '3306'
+      attribute :run_group, kind_of: String, default: 'mysql'
+      attribute :run_user, kind_of: String, default: 'mysql'
+      attribute :socket, kind_of: String, default: nil
+      attribute :tmp_dir, kind_of: String, default: nil
+      attribute :version, kind_of: String, default: nil
       # sample how to specify an attribute is required...
-      # attribute :yuor_auth, kind_of: [String, Array], required: true
-
-      attribute :install_bundle_url, :kind_of => String, :default => nil
-
-      attribute :enabled, :kind_of => [TrueClass, FalseClass, NilClass], :default => false
-      attribute :installed, :kind_of => [TrueClass, FalseClass, NilClass], :default => false
-
+      # attribute :your_auth, kind_of: [String, Array], required: true
+      attribute :install_bundle_url, kind_of: String, default: nil
+      attribute :enabled, kind_of: [TrueClass, FalseClass, NilClass], default: false
+      attribute :installed, kind_of: [TrueClass, FalseClass, NilClass], default: false
     end
   end
 end

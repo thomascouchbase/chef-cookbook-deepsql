@@ -118,7 +118,7 @@ module DeepSql
 
     def parsed_version
       new_resource.version if new_resource.version
-      # todo add per platform defaults
+      # TODO: add per platform defaults
     end
 
     def v56plus
