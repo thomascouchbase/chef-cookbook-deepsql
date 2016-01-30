@@ -1,15 +1,32 @@
 ---
 driver:
   name: vagrant
+  customize:
+    memory: 2048
 
 provisioner:
   name: chef_solo
 
 platforms:
   - name: ubuntu-14.04
-  - name: centos-7.1
+    driver:
+      image: ubuntu-upstart:14.04
+      pid_one_command: /sbin/init
+      intermediate_instructions:
+        - RUN /usr/bin/apt-get update
+        - RUN /usr/bin/apt-get install apt-transport-https net-tools -y
 
 suites:
   - name: default
     run_list:
     attributes:
+#  - name: service56-single
+#    run_list:
+#    - recipe[deepsql_service_test::single]
+#    includes: [
+#      'ubuntu-14.04'
+#    ]
+#    attributes:
+#      mysql:
+#       version: '5.6.28'
+

@@ -123,20 +123,20 @@ class Chef
           action :create
         end
 
-        directory "#{new_resource.name} :create #{include_dir}" do
-          path include_dir
-          owner new_resource.run_user
-          group new_resource.run_group
-          mode '0750'
-          recursive true
-          action :create
-        end
-
         directory "#{new_resource.name} :create #{run_dir}" do
           path run_dir
           owner new_resource.run_user
           group new_resource.run_group
           mode '0755'
+          recursive true
+          action :create
+        end
+
+        directory "#{new_resource.name} :create #{include_dir}" do
+          path include_dir
+          owner new_resource.run_user
+          group new_resource.run_group
+          mode '0750'
           recursive true
           action :create
         end
