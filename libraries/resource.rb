@@ -47,6 +47,9 @@ class Chef
       attribute :tmp_dir, :kind_of => String, :default => nil
       attribute :version, :kind_of => String, :default => nil
 
+      # sample how to specify an attribute is required...
+      # attribute :yuor_auth, kind_of: [String, Array], required: true
+
       attribute :install_bundle_url, :kind_of => String, :default => nil
 
       attribute :enabled, :kind_of => [TrueClass, FalseClass, NilClass], :default => false

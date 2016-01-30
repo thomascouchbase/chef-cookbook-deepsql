@@ -1,0 +1,21 @@
+/etc/<%= @deepsql_name %>/*.pem r,
+/etc/<%= @deepsql_name %>/conf.d/ r,
+/etc/<%= @deepsql_name %>/conf.d/* r,
+/etc/<%= @deepsql_name %>/my.cnf r,
+
+<%= @log_dir %>/ r,
+<%= @log_dir %>/* rw,
+
+<%= @data_dir %>/ r,
+<%= @data_dir %>/** rwk,
+
+/run/<%= @deepsql_name %>/** rw,
+/var/run/<%= @deepsql_name %>/** rw,
+/run/<%= @deepsql_name %>/mysqld.pid rw,
+/var/run/<%= @deepsql_name %>/mysqld.pid rw,
+/run/<%= @deepsql_name %>/mysqld.sock rw,
+/var/run/<%= @deepsql_name %>/mysqld.sock rw,
+
+/tmp/<%= @deepsql_name %>/ r,
+/tmp/<%= @deepsql_name %>/my.sql r,
+

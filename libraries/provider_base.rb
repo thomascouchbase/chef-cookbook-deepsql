@@ -20,11 +20,10 @@ require_relative './helpers.rb'
 class Chef
   class Provider
     class DeepSqlProviderBase < Chef::Provider::LWRPBase
-      provides :deepsql_service if respond_to?(:provides)
+
+      use_inline_resources if defined?(use_inline_resources)
 
       include DeepSql::Helper
-
-      use_inline_resources
 
       def whyrun_supported?
         true
@@ -32,6 +31,65 @@ class Chef
 
       action :create do
         Chef::Log.info("Base::Create")
+
+        install_software
+
+        stop_system_service
+
+        unless ::File.exist?('/.dockerenv') || ::File.exist?('/.dockerinit')
+          configure_system_security
+        end
+
+        create_group_and_user
+
+        create_support_directories
+
+        create_configuration_file
+
+        initialize_database
+
+      end
+
+      def initialize_database
+        bash "#{new_resource.name} :create initial records" do
+          code init_records_script
+          returns [0, 1, 2] # facepalm
+          not_if "/usr/bin/test -f #{parsed_data_dir}/mysql/user.frm"
+          action :run
+        end
+      end
+
+      def create_configuration_file
+        template "#{new_resource.name} :create #{etc_dir}/my.cnf" do
+          path "#{etc_dir}/my.cnf"
+          source 'my.cnf.erb'
+          cookbook 'deepsql'
+          owner new_resource.run_user
+          group new_resource.run_group
+          mode '0755'
+          variables(
+              :config          => new_resource,
+              :error_log       => error_log,
+              :include_dir     => include_dir,
+              :lc_messages_dir => lc_messages_dir,
+              :pid_file        => pid_file,
+              :socket_file     => socket_file,
+              :tmp_dir         => tmp_dir,
+              :data_dir        => parsed_data_dir
+          )
+          action :create
+        end
+
+        template "#{new_resource.name} :create #{etc_dir}/conf.d/deep.cnf" do
+          path "#{etc_dir}/conf.d/deep.cnf"
+          source 'deep.cnf.erb'
+          cookbook 'deepsql'
+          owner new_resource.run_user
+          group new_resource.run_group
+          mode '0600'
+          action :create
+        end
+
       end
 
       action :delete do
@@ -45,7 +103,67 @@ class Chef
 
       private
 
-      def something
+      def create_group_and_user
+        # System users
+        group "#{new_resource.name} :create mysql" do
+          group_name 'mysql'
+          action :create
+        end
+
+        user "#{new_resource.name} :create mysql" do
+          username 'mysql'
+          gid 'mysql'
+          action :create
+        end
+      end
+
+      def create_support_directories
+
+        # Support directories
+        directory "#{new_resource.name} :create #{etc_dir}" do
+          path etc_dir
+          owner new_resource.run_user
+          group new_resource.run_group
+          mode '0755'
+          recursive true
+          action :create
+        end
+
+        directory "#{new_resource.name} :create #{include_dir}" do
+          path include_dir
+          owner new_resource.run_user
+          group new_resource.run_group
+          mode '0750'
+          recursive true
+          action :create
+        end
+
+        directory "#{new_resource.name} :create #{run_dir}" do
+          path run_dir
+          owner new_resource.run_user
+          group new_resource.run_group
+          mode '0755'
+          recursive true
+          action :create
+        end
+
+        directory "#{new_resource.name} :create #{log_dir}" do
+          path log_dir
+          owner new_resource.run_user
+          group new_resource.run_group
+          mode '0750'
+          recursive true
+          action :create
+        end
+
+        directory "#{new_resource.name} :create #{parsed_data_dir}" do
+          path parsed_data_dir
+          owner new_resource.run_user
+          group new_resource.run_group
+          mode '0750'
+          recursive true
+          action :create
+        end
       end
 
     end

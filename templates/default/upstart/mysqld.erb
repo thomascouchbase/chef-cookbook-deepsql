@@ -1,0 +1,26 @@
+# <%= @deepsql_name %> Service
+
+description     "deepSQL service <%= @deepsql_name %>"
+author          "chef-client"
+
+start on runlevel [2345]
+stop on starting rc RUNLEVEL=[016]
+
+respawn
+respawn limit 2 5
+
+env HOME=/etc/<%= @deepsql_name %>
+umask 007
+
+kill timeout 300
+
+pre-start script
+[ -d <%= @run_dir %> ] || install -m 755 -o <%= @run_user %> -g <%= @run_group %> -d <%= @run_dir %>
+[ -d <%= @socket_dir %> ] || install -m 755 -o <%= @run_user %> -g <%= @run_group %> -d <%= @socket_dir %>
+end script
+
+exec /usr/sbin/mysqld --defaults-file=<%= @defaults_file %> --plugin-dir=/usr/lib/mysql/plugin --pid-file=<%= @pid_file %> --socket=<%= @socket_file %>
+
+post-start script
+/usr/sbin/<%= @deepsql_name %>-wait-ready
+end script

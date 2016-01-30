@@ -29,7 +29,78 @@ class Chef
         end
       end
 
-      action :create do
+      def stop_system_service
+        service "#{new_resource.name} :create #{system_service_name}" do
+          service_name system_service_name
+          provider Chef::Provider::Service::Init
+          supports :status => true
+          action [:stop, :disable]
+        end
+      end
+
+      def configure_system_security
+        package "#{new_resource.name} :create apparmor" do
+          package_name 'apparmor'
+          action :install
+        end
+
+        directory "#{new_resource.name} :create /etc/apparmor.d/local/mysql" do
+          path '/etc/apparmor.d/local/mysql'
+          owner 'root'
+          group 'root'
+          mode '0755'
+          recursive true
+          action :create
+        end
+
+        template "#{new_resource.name} :create /etc/apparmor.d/local/usr.sbin.mysqld" do
+          path '/etc/apparmor.d/local/usr.sbin.mysqld'
+          cookbook 'deepsql'
+          source 'apparmor/usr.sbin.mysqld-local.erb'
+          owner 'root'
+          group 'root'
+          mode '0644'
+          action :create
+          notifies :restart, "service[#{new_resource.name} :create apparmor]", :immediately
+        end
+
+        template "#{new_resource.name} :create /etc/apparmor.d/usr.sbin.mysqld" do
+          path '/etc/apparmor.d/usr.sbin.mysqld'
+          cookbook 'deepsql'
+          source 'apparmor/usr.sbin.mysqld.erb'
+          owner 'root'
+          group 'root'
+          mode '0644'
+          action :create
+          notifies :restart, "service[#{new_resource.name} :create apparmor]", :immediately
+        end
+
+        template "#{new_resource.name} :create /etc/apparmor.d/local/mysql/#{new_resource.instance}" do
+          path "/etc/apparmor.d/local/mysql/#{new_resource.instance}"
+          cookbook 'deepsql'
+          source 'apparmor/usr.sbin.mysqld-instance.erb'
+          owner 'root'
+          group 'root'
+          mode '0644'
+          variables(
+              :data_dir     => parsed_data_dir,
+              :deepsql_name => deepsql_name,
+              :log_dir      => log_dir,
+              :run_dir      => run_dir,
+              :pid_file     => pid_file,
+              :socket_file  => socket_file
+          )
+          action :create
+          notifies :restart, "service[#{new_resource.name} :create apparmor]", :immediately
+        end
+
+        service "#{new_resource.name} :create apparmor" do
+          service_name 'apparmor'
+          action :nothing
+        end
+      end
+
+      def install_software
         Chef::Log.info("Upstart::Create")
 
         # install system dependencies...
@@ -62,7 +133,7 @@ class Chef
           download_url = "https://deepsql.s3.amazonaws.com/apt/#{node['platform']}/trusty/mysql-#{new_resource.version}/deepsql_3.3.1_amd64.deb-bundle.tar"
         end
 
-        tmp = '/tmp'
+        tmp  = '/tmp'
         path = "#{tmp}/#{URI(download_url).path.split('/').last}"
         Chef::Log.info(download_url)
         Chef::Log.info(path)
@@ -101,6 +172,44 @@ class Chef
       end
 
       action :start do
+        template "#{new_resource.name} :start /usr/sbin/#{deepsql_name}-wait-ready" do
+          path "/usr/sbin/#{deepsql_name}-wait-ready"
+          source 'upstart/mysqld-wait-ready.erb'
+          owner 'root'
+          group 'root'
+          mode '0755'
+          variables(:socket_file => socket_file)
+          cookbook 'deepsql'
+          action :create
+        end
+
+        template "#{new_resource.name} :start /etc/init/#{deepsql_name}.conf" do
+          path "/etc/init/#{deepsql_name}.conf"
+          source 'upstart/mysqld.erb'
+          owner 'root'
+          group 'root'
+          mode '0644'
+          variables(
+              :defaults_file => defaults_file,
+              :deepsql_name  => deepsql_name,
+              :pid_file      => pid_file,
+              :run_group     => new_resource.run_group,
+              :run_user      => new_resource.run_user,
+              :run_dir       => run_dir,
+              :socket_dir    => socket_dir,
+              :socket_file   => socket_file
+          )
+          cookbook 'deepsql'
+          action :create
+        end
+
+        service "#{new_resource.name} :start #{deepsql_name}" do
+          service_name deepsql_name
+          provider Chef::Provider::Service::Upstart
+          supports :status => true
+          action [:start]
+        end
+
       end
 
       action :stop do

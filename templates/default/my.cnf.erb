@@ -1,0 +1,68 @@
+# Chef generated my.cnf for instance mysql-<%= @config.name %>
+
+[client]
+<% if @config.charset %>
+default-character-set          = <%= @config.charset %>
+<% end %>
+<% if @config.port %>
+port                           = <%= @config.port %>
+<% end %>
+<% if @socket_file %>
+socket                         = <%= @socket_file %>
+<% end %>
+
+[mysql]
+<% if @config.charset %>
+default-character-set          = <%= @config.charset %>
+<% end %>
+
+[mysqld]
+plugin-load=deep=ha_deep.so
+<% if @config.run_user %>
+deep-activation-key            = <%= @config.activation_key %>
+<% end %>
+<% if @config.run_user %>
+user                           = <%= @config.run_user %>
+<% end %>
+<% if @pid_file %>
+pid-file                       = <%= @pid_file %>
+<% end %>
+<% if @socket_file %>
+socket                         = <%= @socket_file %>
+<% end %>
+<% if @config.bind_address %>
+bind-address                   = <%= @config.bind_address %>
+<% end %>
+<% if @config.port %>
+port                           = <%= @config.port %>
+<% end %>
+basedir                        = /usr
+<% if @data_dir %>
+datadir                        = <%= @data_dir %>
+<% end %>
+<% if @tmp_dir %>
+tmpdir                         = <%= @tmp_dir %>
+<% end %>
+<% @config.mysqld_options.each do |option,value| %>
+<%= option %>                  = <%= value %>
+<% end %>
+# todo: this may be able to be removed!
+<% if @lc_messages_dir %>
+lc-messages-dir                = <%= @lc_messages_dir %>
+<% end %>
+explicit_defaults_for_timestamp
+<% if @error_log %>
+log-error                      = <%= @error_log %>
+<% end %>
+<% if @include_dir %>
+!includedir <%= @include_dir %>
+<% end %>
+
+[mysqld_safe]
+<% if @pid_file %>
+pid-file                       = <%= @pid_file %>
+<% end %>
+<% if @socket_file %>
+socket                         = <%= @socket_file %>
+<% end %>
+nice                           = 0

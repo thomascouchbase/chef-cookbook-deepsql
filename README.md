@@ -297,6 +297,16 @@ On the RHEL platform_family, applying the `yum::default` recipe will
 allow you to drive the `yum_globalconfig` resource with attributes to
 change the global yum proxy settings.
 
+### How do I check AppArmor profiles?
+
+```
+  apt-get install apparmor-utils
+  dmesg --clear
+  /usr/sbin/mysqld --defaults-file=/etc/deepsql-deep/my.cnf --initialize --explicit_defaults_for_timestamp
+  dmesg
+  aa-logprof
+```
+
 License & Authors
 -----------------
 - Author:: Robert Buck (<buck.robert.j@gmail.com>)
