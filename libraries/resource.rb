@@ -31,6 +31,8 @@ class Chef
       attribute :bind_address, kind_of: String, default: nil
       attribute :charset, kind_of: String, default: 'utf8'
       attribute :data_dir, kind_of: String, default: nil
+      attribute :default_storage_engine, kind_of: String, default: 'Deep'
+      attribute :default_tmp_storage_engine, kind_of: String, default: 'Deep'
       attribute :error_log, kind_of: String, default: nil
       attribute :initial_root_password, kind_of: String, default: 'ilikerandompasswords'
       attribute :instance, kind_of: String, name_attribute: true

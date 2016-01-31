@@ -192,6 +192,7 @@ module DeepSql
     def init_records_script
       <<-EOS
         set -e
+        export LD_PRELOAD=/usr/lib/mysql/plugin/libtcmalloc_minimal.so
         rm -rf /tmp/#{deepsql_name}
         mkdir /tmp/#{deepsql_name}
 

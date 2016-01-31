@@ -27,6 +27,12 @@ default-character-set          = <%= @config.charset %>
 
 [mysqld]
 plugin-load=deep=ha_deep.so
+<% if @config.default_storage_engine %>
+default-storage-engine         = <%= @config.default_storage_engine %>
+<% end %>
+<% if @config.default_tmp_storage_engine %>
+default-tmp-storage-engine     = <%= @config.default_tmp_storage_engine %>
+<% end %>
 <% if @config.run_user %>
 deep-activation-key            = <%= @config.activation_key %>
 <% end %>
