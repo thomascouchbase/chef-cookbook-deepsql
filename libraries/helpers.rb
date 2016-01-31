@@ -76,6 +76,7 @@ module DeepSql
     end
 
     def lc_messages_dir
+      '/usr/share/mysql'
     end
 
     def log_dir

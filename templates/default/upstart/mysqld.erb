@@ -10,16 +10,23 @@ respawn
 respawn limit 2 5
 
 env HOME=/etc/<%= @deepsql_name %>
+env LD_PRELOAD=/usr/lib/mysql/plugin/libtcmalloc_minimal.so
 umask 007
 
+kill signal SIGTERM
 kill timeout 300
 
 pre-start script
-[ -d <%= @run_dir %> ] || install -m 755 -o <%= @run_user %> -g <%= @run_group %> -d <%= @run_dir %>
-[ -d <%= @socket_dir %> ] || install -m 755 -o <%= @run_user %> -g <%= @run_group %> -d <%= @socket_dir %>
+[ -r $HOME/my.cnf ]
+[ -d <%= @parsed_data_dir %> ] || install -m 750 -o mysql -g mysql -d <%= @parsed_data_dir %>
+[ -d <%= @parsed_data_dir %>/mysql ] || install -m 750 -o mysql -g mysql -d <%= @parsed_data_dir %>/mysql
+[ -d <%= @run_dir %> ] || install -m 755 -o mysql -g root -d <%= @run_dir %>
+[ -d <%= @log_dir %> ] || install -m 750 -o mysql -g adm -d <%= @log_dir %>
+[ -f <%= @log_dir %>/error.log ] || install -m 640 -o mysql -g adm -d <%= @log_dir %>/error.log
+/lib/init/apparmor-profile-load usr.sbin.mysqld
 end script
 
-exec /usr/sbin/mysqld --defaults-file=<%= @defaults_file %> --plugin-dir=/usr/lib/mysql/plugin --pid-file=<%= @pid_file %> --socket=<%= @socket_file %>
+exec /usr/sbin/mysqld --defaults-file=<%= @defaults_file %>
 
 post-start script
 /usr/sbin/<%= @deepsql_name %>-wait-ready

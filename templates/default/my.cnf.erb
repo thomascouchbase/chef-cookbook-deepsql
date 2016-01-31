@@ -11,6 +11,15 @@ port                           = <%= @config.port %>
 socket                         = <%= @socket_file %>
 <% end %>
 
+[mysqld_safe]
+<% if @pid_file %>
+pid-file                       = <%= @pid_file %>
+<% end %>
+<% if @socket_file %>
+socket                         = <%= @socket_file %>
+<% end %>
+nice                           = 0
+
 [mysql]
 <% if @config.charset %>
 default-character-set          = <%= @config.charset %>
@@ -30,9 +39,6 @@ pid-file                       = <%= @pid_file %>
 <% if @socket_file %>
 socket                         = <%= @socket_file %>
 <% end %>
-<% if @config.bind_address %>
-bind-address                   = <%= @config.bind_address %>
-<% end %>
 <% if @config.port %>
 port                           = <%= @config.port %>
 <% end %>
@@ -43,26 +49,21 @@ datadir                        = <%= @data_dir %>
 <% if @tmp_dir %>
 tmpdir                         = <%= @tmp_dir %>
 <% end %>
-<% @config.mysqld_options.each do |option,value| %>
-<%= option %>                  = <%= value %>
-<% end %>
-# todo: this may be able to be removed!
 <% if @lc_messages_dir %>
 lc-messages-dir                = <%= @lc_messages_dir %>
 <% end %>
 explicit_defaults_for_timestamp
+<% if @config.bind_address %>
+bind-address                   = <%= @config.bind_address %>
+<% end %>
 <% if @error_log %>
 log-error                      = <%= @error_log %>
+<% end %>
+sql_mode                       = NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES
+symbolic-links                 = 0
+<% @config.mysqld_options.each do |option,value| %>
+<%= option %>                  = <%= value %>
 <% end %>
 <% if @include_dir %>
 !includedir <%= @include_dir %>
 <% end %>
-
-[mysqld_safe]
-<% if @pid_file %>
-pid-file                       = <%= @pid_file %>
-<% end %>
-<% if @socket_file %>
-socket                         = <%= @socket_file %>
-<% end %>
-nice                           = 0

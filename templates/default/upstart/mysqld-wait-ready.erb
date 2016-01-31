@@ -3,7 +3,7 @@
 # Wait for the server to come up
 ret=0
 while /bin/true; do
-        RESPONSE=`/usr/bin/mysqladmin --no-defaults --socket="<%= @socket_file %>" --user=UNKNOWN_MYSQL_USER ping 2>&1`
+        RESPONSE=`/usr/bin/mysqladmin --defaults-file=<%= @defaults_file %> ping 2>&1`
         mret=$?
         if [ $mret -eq 0 ]; then
             break

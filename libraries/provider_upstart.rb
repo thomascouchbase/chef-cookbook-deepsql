@@ -174,7 +174,7 @@ class Chef
           owner 'root'
           group 'root'
           mode '0755'
-          variables(socket_file: socket_file)
+          variables(defaults_file: defaults_file)
           cookbook 'deepsql'
           action :create
         end
