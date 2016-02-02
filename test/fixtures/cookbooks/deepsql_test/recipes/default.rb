@@ -14,8 +14,9 @@
 # limitations under the License.
 #
 
-source 'https://supermarket.chef.io'
-
-metadata
-
-cookbook 'deepsql_test', path: 'test/fixtures/cookbooks/deepsql_test'
+deepsql_service 'default' do
+  activation_key '000000000000000000000000000000000'
+  version '5.6.28'
+  bind_address '0.0.0.0'
+  action [:create, :start]
+end

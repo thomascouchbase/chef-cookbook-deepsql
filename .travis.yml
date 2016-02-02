@@ -1,38 +1,31 @@
----
-rvm: 2.2
-
 sudo: required
 
 addons:
   apt:
     sources:
-      - chef-current-precise
+      - chef-stable-precise
     packages:
       - chefdk
 
-install: echo "skip bundle install"
+branches:
+  only:
+    - master
 
 services: docker
 
-env:
-  matrix:
-  - INSTANCE=service55-multi-ubuntu-1404
-  - INSTANCE=service56-multi-ubuntu-1404
-  fast_finish: true
+install: echo "skip bundle install"
 
 before_script:
-  - sudo iptables -L DOCKER || ( echo "DOCKER iptables chain missing" ; sudo iptables -N DOCKER )
   - eval "$(/opt/chefdk/bin/chef shell-init bash)"
-  - /opt/chefdk/embedded/bin/chef gem install kitchen-dokken
+  - /opt/chefdk/embedded/bin/chef gem install chef-sugar
 
 script:
   - /opt/chefdk/embedded/bin/chef --version
   - /opt/chefdk/embedded/bin/rubocop --version
-  - /opt/chefdk/embedded/bin/rubocop
   - /opt/chefdk/embedded/bin/foodcritic --version
+  - /opt/chefdk/embedded/bin/rubocop
   - /opt/chefdk/embedded/bin/foodcritic . --exclude spec
-  - /opt/chefdk/embedded/bin/rspec
-#  - KITCHEN_LOCAL_YAML=.kitchen.dokken.yml kitchen test
+  - /opt/chefdk/embedded/bin/rspec spec
 
 after_script:
   - docker images

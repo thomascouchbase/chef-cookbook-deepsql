@@ -29,7 +29,7 @@ class Chef
       end
 
       action :create do
-        Chef::Log.info('Base::Create')
+        Chef::Log.info('[deepSQL Cookbook] Base::Create')
 
         install_software
 
@@ -51,8 +51,8 @@ class Chef
       def initialize_database
         bash "#{new_resource.name} :create initial records" do
           code init_records_script
-          returns [0, 1, 2] # facepalm
-          not_if "/usr/bin/test -f #{parsed_data_dir}/mysql/user.frm"
+          returns [0, 1, 2]
+          not_if { ::File.exist?("#{parsed_data_dir}/mysql/user.frm") }
           action :run
         end
       end
@@ -88,12 +88,6 @@ class Chef
       end
 
       action :delete do
-      end
-
-      action :start do
-      end
-
-      action :stop do
       end
 
       private

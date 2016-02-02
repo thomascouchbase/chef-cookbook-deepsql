@@ -23,7 +23,7 @@ class Chef
       provides :deepsql_service, os: '!windows' if defined?(provides)
 
       action :create do
-        Chef::Log.info('SysVinit::Create')
+        Chef::Log.info('[deepSQL Cookbook] SysVinit::Create')
       end
 
       action :delete do

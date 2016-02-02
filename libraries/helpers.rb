@@ -48,7 +48,7 @@ module DeepSql
 
     def root_password
       if new_resource.initial_root_password == ''
-        Chef::Log.info('Root password is empty')
+        Chef::Log.info('[deepSQL Cookbook] Root password is empty')
         return ''
       end
       Shellwords.escape(new_resource.initial_root_password)

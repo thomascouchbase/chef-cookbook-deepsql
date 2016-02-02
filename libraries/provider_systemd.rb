@@ -27,7 +27,7 @@ class Chef
       end
 
       action :create do
-        Chef::Log.info('Systemd::Create')
+        Chef::Log.info('[deepSQL Cookbook] Systemd::Create')
       end
 
       action :delete do

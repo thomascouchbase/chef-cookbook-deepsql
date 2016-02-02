@@ -98,7 +98,7 @@ class Chef
       end
 
       def install_software
-        Chef::Log.info('Upstart::Create')
+        Chef::Log.info('[deepSQL Cookbook] Upstart::Create')
 
         # install system dependencies...
 
@@ -132,8 +132,6 @@ class Chef
 
         tmp = '/tmp'
         path = "#{tmp}/#{URI(download_url).path.split('/').last}"
-        Chef::Log.info(download_url)
-        Chef::Log.info(path)
 
         remote_file path do
           source download_url
