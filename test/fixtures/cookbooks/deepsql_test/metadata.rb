@@ -14,13 +14,13 @@
 # limitations under the License.
 #
 
-name             'deepsql_test'
-maintainer       'Deep Information Sciences, Inc.'
+name 'deepsql_test'
+maintainer 'Deep Information Sciences, Inc.'
 maintainer_email 'bob@deepis.com'
-license          'Apache License 2.0'
-description      'Installs/Configures a demo to install deepSQL'
+license 'Apache License 2.0'
+description 'Installs/Configures a demo to install deepSQL'
 long_description 'Test cookbook for unit testing the deepSQL Cookbook.'
-version          '1.0'
+version '1.0'
 
 %w( amazon debian ubuntu centos redhat ).each do |os|
   supports os
