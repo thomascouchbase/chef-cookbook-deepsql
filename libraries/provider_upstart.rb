@@ -28,11 +28,6 @@ class Chef
         end
       end
 
-      UBUNTU_PLATFORM_NAMES ||= {
-          '12.04' => 'precise',
-          '14.04' => 'trusty',
-      }
-
       def stop_system_service
         service "#{new_resource.name} :create #{system_service_name}" do
           service_name system_service_name
@@ -111,9 +106,7 @@ class Chef
           libaio1
         )
 
-        if precise?
-          requirements << 'libnuma1'
-        end
+        requirements << 'libnuma1' if precise?
 
         requirements.each do |package|
           apt_package package do
@@ -138,14 +131,14 @@ class Chef
         # repositories on secured networks behind firewalls...
         download_url = new_resource.install_bundle_url
         if download_url.nil?
-          download_url = "https://deepsql.s3.amazonaws.com/apt/#{node['platform']}/#{UBUNTU_PLATFORM_NAMES[node['platform_version']]}/deepsql-#{new_resource.version}/deepsql_#{new_resource.version}-1ubuntu#{node['platform_version']}_amd64.deb-bundle.tar"
+          download_url = "https://deepsql.s3.amazonaws.com/apt/#{node['platform']}/#{platform_release_name}/deepsql-#{new_resource.version}/deepsql_#{new_resource.version}-1ubuntu#{node['platform_version']}_amd64.deb-bundle.tar"
         end
-        bundle = "#{URI(download_url).path.split('/').last}"
+        bundle = URI(download_url).path.split('/').last.to_s
 
         # eng: if we use deb bundles, nothing below should have to
         # change; reach out if you have questions. - bob
 
-        file_cache_path = "#{Chef::Config[:file_cache_path]}"
+        file_cache_path = Chef::Config[:file_cache_path].to_s
         cached_bundle = "#{file_cache_path}/#{bundle}"
         remote_file cached_bundle do
           source download_url
@@ -153,7 +146,7 @@ class Chef
         end
 
         execute "tar xf #{cached_bundle}" do
-          cwd "#{file_cache_path}"
+          cwd file_cache_path.to_s
         end
 
         prefixes = %w(
@@ -165,11 +158,13 @@ class Chef
         )
 
         prefixes.each do |prefix|
-          package "#{prefix}" do
+          package prefix.to_s do
             action :install
-            provider Chef::Provider::Package::Dpkg
+            provider lazy {
+              platform_package_provider
+            }
             source lazy {
-              first_match("#{file_cache_path}/#{prefix}*.deb")
+              first_match("#{file_cache_path}/#{prefix}*.#{platform_package_type}")
             }
           end
         end

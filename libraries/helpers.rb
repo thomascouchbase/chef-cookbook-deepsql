@@ -214,6 +214,13 @@ EOSQL
       Dir["#{regexp}*"].first
     end
 
+    PLATFORM_RELEASE_NAMES ||= {
+      'ubuntu' => {
+        '12.04' => 'precise',
+        '14.04' => 'trusty'
+      }
+    }.freeze
+
     def precise?
       return true if node['platform'] == 'ubuntu' && node['platform_version'] == '12.04'
       false
@@ -222,6 +229,24 @@ EOSQL
     def trusty?
       return true if node['platform'] == 'ubuntu' && node['platform_version'] == '14.04'
       false
+    end
+
+    def platform_package_type
+      return 'rpm' if node['platform_family'] == 'rhel'
+      'deb'
+    end
+
+    def platform_package_provider
+      return Chef::Provider::Package::Rpm if node['platform_family'] == 'rhel'
+      Chef::Provider::Package::Dpkg
+    end
+
+    def platform_release_name
+      if node['platform'] == 'ubuntu'
+        release_names = PLATFORM_RELEASE_NAMES[node['platform']]
+        return release_names[node['platform_version']]
+      end
+      node['platform_version']
     end
   end
 end
