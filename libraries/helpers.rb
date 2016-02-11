@@ -31,7 +31,7 @@ module DeepSql
       opts = []
       new_resource.state_attrs.each do |a|
         current_val = current_resource.send(a)
-        new_val     = new_resource.send(a)
+        new_val = new_resource.send(a)
         opts << "--#{a} #{new_val}" if updated?(current_val, new_val)
       end
       opts
@@ -208,6 +208,20 @@ EOSQL
       #{db_init}
       #{record_init}
       EOS
+    end
+
+    def first_match(regexp)
+      Dir["#{regexp}*"].first
+    end
+
+    def precise?
+      return true if node['platform'] == 'ubuntu' && node['platform_version'] == '12.04'
+      false
+    end
+
+    def trusty?
+      return true if node['platform'] == 'ubuntu' && node['platform_version'] == '14.04'
+      false
     end
   end
 end

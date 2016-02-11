@@ -23,9 +23,9 @@ The following platforms have been tested with Test Kitchen:
 |----------------+-----+-----+-----+-----+-----|
 | debian-7       |     |     |     |     |     |
 |----------------+-----+-----+-----+-----+-----|
-| ubuntu-12.04   |     |     |     |     |     |
+| ubuntu-12.04   |     |     |     |  X  |     |
 |----------------+-----+-----+-----+-----+-----|
-| ubuntu-14.04   |     |     |     | X   |     |
+| ubuntu-14.04   |     |     |     |  X  |     |
 |----------------+-----+-----+-----+-----+-----|
 | ubuntu-15.04   |     |     |     |     |     |
 |----------------+-----+-----+-----+-----+-----|
@@ -165,6 +165,29 @@ omitted, it will default to the platform's native location.
   for the platform, where applicable. When omitted, it will install
   the default DeepSQL version for the target platform. Available version
   numbers are `5.0`, `5.1`, `5.5`, `5.6`, and `5.7`, depending on platform.
+
+- `install_bundle_url` - allows the user to specify an alternate location
+  to download a deb or rpm bundle from; this is useful for those environments
+  that are secured and behind corporate firewalls, or where policies prohibit
+  installation of packages directly from the internet. Package bundles may
+  be built as follows on a scratch host:
+
+    1. Download the desired deepSQL installer (deep-install.sh)
+    2. Modify deep-install.sh by commenting out the rm -fr command.
+    3. Run the install command; it will fail.
+    4. Go to /tmp/deep-*
+    5. Run the installer.sh script, providing your activation key, and
+       the deepSQL root password (perhaps use 'secret').
+    6. After installation completes, in the tmp directory run the following
+       for Ubuntu, or similar for CentOS (noting slight changes for the
+       specific version you are using):
+
+        cd /tmp/deep-*
+        mkdir deepsql-bundle
+        mv *_amd64.deb deepsql-bundle
+        mv deep.deb deepsql-bundle/deepsql-plugin_5.6.28-21214-1ubuntu14.04_amd64.deb
+        cd deepsql-bundle
+        tar cf deepsql_5.6.28-1ubuntu14.04_amd64.deb-bundle.tar *.deb
 
 #### Actions
 

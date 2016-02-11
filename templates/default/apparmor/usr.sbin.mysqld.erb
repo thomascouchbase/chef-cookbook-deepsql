@@ -24,9 +24,14 @@
   /etc/mysql/conf.d/ r,
   /etc/mysql/conf.d/* r,
 
-  /proc/*/status r,
+  /proc/[0-9]*/status r,
+<% unless node['platform_version'] == '12.04' -%>
   /proc/@{pid}/mounts r,
   /proc/@{pid}/task/*/mem r,
+<% else -%>
+  /proc/[0-9]*/mounts r,
+  /proc/[0-9]*/task/*/mem r,
+<% end -%>
 
   /run/mysqld/mysqld.pid rw,
   /var/run/mysqld/mysqld.pid rw,

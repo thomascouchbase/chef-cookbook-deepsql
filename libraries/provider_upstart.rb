@@ -28,6 +28,11 @@ class Chef
         end
       end
 
+      UBUNTU_PLATFORM_NAMES ||= {
+          '12.04' => 'precise',
+          '14.04' => 'trusty',
+      }
+
       def stop_system_service
         service "#{new_resource.name} :create #{system_service_name}" do
           service_name system_service_name
@@ -106,6 +111,10 @@ class Chef
           libaio1
         )
 
+        if precise?
+          requirements << 'libnuma1'
+        end
+
         requirements.each do |package|
           apt_package package do
             action :install
@@ -116,8 +125,8 @@ class Chef
 
         ruby_block 'set debconf for mysql' do
           block do
-            `echo mysql-server mysql-server/root_password password '#{root_password}' | sudo debconf-set-selections`
-            `echo mysql-server mysql-server/root_password_again password '#{root_password}' | sudo debconf-set-selections`
+            `echo deepsql-server deepsql-server/root-pass password #{root_password} | debconf-set-selections`
+            `echo deepsql-server deepsql-server/re-root-pass password #{root_password} | debconf-set-selections`
             `echo deep-plugin deep-plugin/deep_activation_key string #{new_resource.activation_key} | debconf-set-selections`
             `echo deep-plugin deep-plugin/deep_mysql_root_password password #{root_password} | debconf-set-selections`
           end
@@ -125,39 +134,43 @@ class Chef
           not_if { ::File.exist?('/etc/mysql/my.cnf') }
         end
 
+        # permit customers to point their chef recipes at internal package
+        # repositories on secured networks behind firewalls...
         download_url = new_resource.install_bundle_url
         if download_url.nil?
-          download_url = "https://deepsql.s3.amazonaws.com/apt/#{node['platform']}/trusty/mysql-#{new_resource.version}/deepsql_3.3.1_amd64.deb-bundle.tar"
+          download_url = "https://deepsql.s3.amazonaws.com/apt/#{node['platform']}/#{UBUNTU_PLATFORM_NAMES[node['platform_version']]}/deepsql-#{new_resource.version}/deepsql_#{new_resource.version}-1ubuntu#{node['platform_version']}_amd64.deb-bundle.tar"
         end
+        bundle = "#{URI(download_url).path.split('/').last}"
 
-        tmp = '/tmp'
-        path = "#{tmp}/#{URI(download_url).path.split('/').last}"
+        # eng: if we use deb bundles, nothing below should have to
+        # change; reach out if you have questions. - bob
 
-        remote_file path do
+        file_cache_path = "#{Chef::Config[:file_cache_path]}"
+        cached_bundle = "#{file_cache_path}/#{bundle}"
+        remote_file cached_bundle do
           source download_url
           action :create_if_missing
         end
 
-        execute "tar xf #{path}" do
-          cwd tmp
+        execute "tar xf #{cached_bundle}" do
+          cwd "#{file_cache_path}"
         end
 
-        packages = %w(
-          mysql-common
-          libmysqlclient18
-          libmysqlclient-dev
-          mysql-community-client
-          mysql-client
-          mysql-community-server
-          mysql-server
-          deep-mysql-community-plugin
+        prefixes = %w(
+          deepsql-common
+          deepsql-client
+          libdeepsqlclient18
+          deepsql-server
+          deepsql-plugin
         )
 
-        packages.each do |package|
-          package package do
+        prefixes.each do |prefix|
+          package "#{prefix}" do
             action :install
             provider Chef::Provider::Package::Dpkg
-            source "/tmp/bundle/#{package}.deb"
+            source lazy {
+              first_match("#{file_cache_path}/#{prefix}*.deb")
+            }
           end
         end
       end
