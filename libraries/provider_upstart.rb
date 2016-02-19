@@ -131,7 +131,7 @@ class Chef
         # repositories on secured networks behind firewalls...
         download_url = new_resource.install_bundle_url
         if download_url.nil?
-          download_url = "https://deepsql.s3.amazonaws.com/apt/#{node['platform']}/#{platform_release_name}/deepsql-#{new_resource.version}/deepsql_#{new_resource.version}-1ubuntu#{node['platform_version']}_amd64.deb-bundle.tar"
+          download_url = "#{bundle_directory_url}/deepsql_#{new_resource.version}_amd64.deb-bundle.tar"
         end
         bundle = URI(download_url).path.split('/').last.to_s
 

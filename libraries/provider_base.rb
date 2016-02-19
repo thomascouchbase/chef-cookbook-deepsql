@@ -64,7 +64,7 @@ class Chef
           cookbook 'deepsql'
           owner new_resource.run_user
           group new_resource.run_group
-          mode '0755'
+          mode '0644'
           variables(config: new_resource,
                     error_log: error_log,
                     include_dir: include_dir,
@@ -82,7 +82,7 @@ class Chef
           cookbook 'deepsql'
           owner new_resource.run_user
           group new_resource.run_group
-          mode '0600'
+          mode '0644'
           action :create
         end
       end
@@ -130,7 +130,7 @@ class Chef
           path include_dir
           owner new_resource.run_user
           group new_resource.run_group
-          mode '0750'
+          mode '0755'
           recursive true
           action :create
         end

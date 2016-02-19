@@ -10,7 +10,6 @@ respawn
 respawn limit 2 5
 
 env HOME=/etc/<%= @deepsql_name %>
-env LD_PRELOAD=/usr/lib/mysql/plugin/libtcmalloc_minimal.so
 umask 007
 
 kill signal SIGTERM

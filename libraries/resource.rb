@@ -50,6 +50,7 @@ class Chef
       # sample how to specify an attribute is required...
       # attribute :your_auth, kind_of: [String, Array], required: true
       attribute :install_bundle_url, kind_of: String, default: nil
+      attribute :repository_baseurl, kind_of: String, default: 'https://deepsql.s3.amazonaws.com/repository'
       attribute :enabled, kind_of: [TrueClass, FalseClass, NilClass], default: false
       attribute :installed, kind_of: [TrueClass, FalseClass, NilClass], default: false
     end

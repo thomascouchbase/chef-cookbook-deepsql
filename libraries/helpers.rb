@@ -192,14 +192,13 @@ module DeepSql
     def init_records_script
       <<-EOS
         set -e
-        export LD_PRELOAD=/usr/lib/mysql/plugin/libtcmalloc_minimal.so
         rm -rf /tmp/#{deepsql_name}
         mkdir /tmp/#{deepsql_name}
 
         cat > /tmp/#{deepsql_name}/my.sql <<-EOSQL
 UPDATE mysql.user SET #{password_column_name}=PASSWORD('#{root_password}')#{password_expired} WHERE user = 'root';
 DELETE FROM mysql.user WHERE USER LIKE '';
-DELETE FROM mysql.user WHERE user = 'root' and host NOT IN ('127.0.0.1', 'localhost');
+DELETE FROM mysql.user WHERE user = 'root' and host NOT IN ('127.0.0.1', 'localhost', '::1');
 FLUSH PRIVILEGES;
 DELETE FROM mysql.db WHERE db LIKE 'test%';
 DROP DATABASE IF EXISTS test ;
@@ -207,6 +206,11 @@ EOSQL
 
       #{db_init}
       #{record_init}
+
+       while [ ! -f #{pid_file} ] ; do sleep 1 ; done
+       kill `cat #{pid_file}`
+       while [ -f #{pid_file} ] ; do sleep 1 ; done
+       rm -rf /tmp/#{deepsql_name}
       EOS
     end
 
@@ -247,6 +251,10 @@ EOSQL
         return release_names[node['platform_version']]
       end
       node['platform_version']
+    end
+
+    def bundle_directory_url
+      "#{new_resource.repository_baseurl}/#{node['platform']}/#{platform_release_name}/x86_64/deepsql"
     end
   end
 end
