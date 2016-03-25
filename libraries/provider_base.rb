@@ -41,11 +41,23 @@ class Chef
 
         create_group_and_user
 
+        delete_existing_my_cnf
+
         create_support_directories
 
         create_configuration_file
 
         initialize_database
+      end
+
+      def delete_existing_my_cnf
+        # Turns out that mysqld is hard coded to try and read
+        # /etc/mysql/my.cnf, and its presence causes problems when
+        # setting up multiple services.
+        file "#{new_resource.name} :create /etc/mysql/my.cnf" do
+          path "/etc/mysql/my.cnf"
+          action :delete
+        end
       end
 
       def initialize_database
