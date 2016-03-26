@@ -55,7 +55,7 @@ class Chef
         # /etc/mysql/my.cnf, and its presence causes problems when
         # setting up multiple services.
         file "#{new_resource.name} :create /etc/mysql/my.cnf" do
-          path "/etc/mysql/my.cnf"
+          path '/etc/mysql/my.cnf'
           action :delete
         end
       end
